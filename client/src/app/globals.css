@@ -1,26 +1,53 @@
-@import "tailwindcss";
+@import "tailwindcss"; /* This imports all Tailwind base, components, and utilities */
 
 :root {
+  /* Default Light Theme colors */
   --background: #ffffff;
   --foreground: #171717;
+  /* Define your specific brown colors here for consistency with the design */
+  --color-primary-brown: #4a2a1a; /* Example dark brown from your design */
+  --color-secondary-brown: #6f4e37; /* Lighter brown for accents */
 }
 
+/* @theme inline is a PostCSS feature, often used with plugins or frameworks like next-themes
+   If you're directly using these as CSS variables, you'd access them like var(--color-background) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Ensure these font variables are correctly picked up by your Tailwind config */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Dark Theme colors (will apply if user's OS is in dark mode) */
     --background: #0a0a0a;
     --foreground: #ededed;
+    --color-primary-brown: #3a1e0e; /* Darker brown for dark mode */
+    --color-secondary-brown: #5c3d2b; /* Adjusted lighter brown */
   }
 }
 
 body {
+  /* Apply CSS variables for background and text color */
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* REMOVED: font-family: Arial, Helvetica, sans-serif; */
+  /* This ensures your Geist fonts from layout.tsx (via Tailwind font-sans) are used. */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out,
+    all 0.3s ease-in-out; /* Smooth transitions for theme and dir changes */
+}
+
+/* Tailwind handles RTL for properties like padding/margin start/end naturally. */
+/* For explicit text alignment in RTL context, you might need specific classes if not relying on natural flow. */
+/* Example: */
+[dir="rtl"] .text-right-rtl {
+  text-align: right;
+}
+[dir="rtl"] .text-left-rtl {
+  text-align: left;
 }

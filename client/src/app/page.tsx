@@ -1,103 +1,228 @@
-import Image from "next/image";
+// src/app/page.tsx
+"use client";
 
-export default function Home() {
+import React, { useState, useEffect } from "react";
+import Header from "../components/Header";
+import TeamSection from "../components/TeamSection";
+import ClientTestimonialsSection from "../components/ClientTestimonialsSection";
+import Footer from "../components/Footer"; // Import the new Footer component
+import { fetchStrapiData } from "../lib/strapi"; // getStrapiMediaUrl removed
+import { HomePageAttributes, StrapiSingleResponse } from "../types/strapi";
+import { useSelector } from "react-redux";
+import { RootState } from "../lib/redux/store";
+
+const HomePage: React.FC = () => {
+  const currentLanguage = useSelector(
+    (state: RootState) => state.language.currentLanguage
+  );
+  const isRTL = useSelector(
+    (state: RootState) => state.language.direction === "rtl"
+  );
+
+  const [homePageData, setHomePageData] = useState<HomePageAttributes | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // const handlePageNavigation = (path: string) => {
+  //   window.history.pushState({}, "", path);
+  //   window.dispatchEvent(new Event("popstate"));
+  // };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetching HomePage data (no populate for images)
+        const response = await fetchStrapiData<
+          StrapiSingleResponse<HomePageAttributes>
+        >("/home-page", currentLanguage);
+        if (response?.data) {
+          setHomePageData(response.data.attributes);
+        } else {
+          setError("Home page data not found in Strapi.");
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch home page data:", err);
+        setError(err.message || "Failed to load home page content.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentLanguage]);
+
+  // Hardcoded image URLs for the hero section
+  const hardcodedBackgroundImage =
+    "https://placehold.co/1920x1080/0A0A0A/FFFFFF?text=Hero+Background"; // Example city/highway scene
+  const hardcodedPersonImage =
+    "https://placehold.co/400x500/4A2A1A/FFFFFF?text=Hero+Person"; // Example person image
+
+  // Hero Slider Logic (using hardcoded images and static content for now)
+  const heroSlides = homePageData
+    ? [
+        {
+          id: 1,
+          title: homePageData.HeroTitle,
+          description: homePageData.HeroDescription,
+          backgroundImageSrc: hardcodedBackgroundImage,
+          personImageSrc: hardcodedPersonImage,
+          personImageAlt: "Hero Person Image", // Hardcoded alt text for now
+          videoUrl: homePageData.HeroVideoUrl, // Still checks for video URL from Strapi if present
+          ctaText: isRTL ? "اقرأ المزيد" : "Read More",
+        },
+      ]
+    : [];
+
+  const currentHeroSlide = heroSlides[currentSlide];
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-background text-foreground">
+        <p className="text-xl">Loading home page content...</p>
+      </div>
+    );
+  }
+
+  if (error || !homePageData) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-red-100 text-red-700 flex-col p-8">
+        <p className="text-xl font-bold">
+          Error: {error || "Could not load home page data."}
+        </p>
+        <p className="text-lg mt-2 text-center"></p>
+      </div>
+    );
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <div className={`min-h-screen relative`}>
+      <Header />
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          {currentHeroSlide.videoUrl ? (
+            <video
+              className="w-full h-full object-cover"
+              src={currentHeroSlide.videoUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          ) : (
+            <img
+              src={currentHeroSlide.backgroundImageSrc}
+              alt={currentHeroSlide.backgroundImageSrc || "Hero Background"}
+              className="w-full h-full object-cover"
+            />
+          )}
+          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute inset-0 bg-brown-light opacity-20"></div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {heroSlides.length > 1 && (
+          <button
+            onClick={() =>
+              setCurrentSlide(
+                (prev) => (prev - 1 + heroSlides.length) % heroSlides.length
+              )
+            }
+            className={`absolute left-8 top-1/2 transform -translate-y-1/2 z-20 text-white hover:text-brown-accent transition-colors text-4xl p-2 rounded-full bg-black/30 hover:bg-black/50 ${
+              isRTL ? "rtl-flip-arrow" : ""
+            }`}
+            aria-label="Previous Slide"
+          >
+            &larr;
+          </button>
+        )}
+
+        <div
+          className={`relative z-10 text-white flex flex-col md:flex-row items-center justify-center p-8 max-w-7xl mx-auto w-full ${
+            isRTL ? "md:flex-row-reverse" : ""
+          }`}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <div
+            className={`flex-1 ${
+              isRTL ? "md:ml-16 text-right-rtl" : "md:mr-16 text-left"
+            } mb-8 md:mb-0`}
+          >
+            <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              {currentHeroSlide.title}
+            </h1>
+            <p className="text-lg mb-8 leading-relaxed max-w-xl opacity-90">
+              {currentHeroSlide.description}
+            </p>
+            <button className="bg-white text-brown-primary px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors shadow-lg">
+              {currentHeroSlide.ctaText}
+            </button>
+          </div>
+
+          <div
+            className={`flex-1 flex ${
+              isRTL ? "justify-start" : "justify-end"
+            } items-center h-full`}
+          >
+            <div
+              className="relative w-72 h-96 lg:w-80 lg:h-[420px] rounded-lg shadow-2xl overflow-hidden"
+              style={{ backgroundColor: "var(--color-brown-testimonials-bg)" }}
+            >
+              <div className="absolute inset-0 flex items-center justify-center">
+                <img
+                  src={currentHeroSlide.personImageSrc}
+                  alt={currentHeroSlide.personImageAlt}
+                  className="w-full h-full object-cover rounded-lg"
+                  style={{ transform: "scale(1.05)" }}
+                />
+                <div className="absolute inset-0 bg-black/10"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {heroSlides.length > 1 && (
+          <div className="absolute left-6 top-1/2 transform -translate-y-1/2 flex flex-col space-y-3 z-10">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                  index === currentSlide ? "bg-white" : "bg-white/30"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {heroSlides.length > 1 && (
+          <button
+            onClick={() =>
+              setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+            }
+            className={`absolute right-8 top-1/2 transform -translate-y-1/2 z-20 text-white hover:text-brown-accent transition-colors text-4xl p-2 rounded-full bg-black/30 hover:bg-black/50 ${
+              isRTL ? "rtl-flip-arrow" : ""
+            }`}
+            aria-label="Next Slide"
+          >
+            &rarr;
+          </button>
+        )}
+      </section>
+      <TeamSection
+        sectionTitle={homePageData.OurTeam}
+        sectionDescription={homePageData.OurTeamDes}
+      />
+      <ClientTestimonialsSection
+        sectionTitle={homePageData.TestimonialTitle}
+        sectionDescription={homePageData.TestimonialDes}
+      />
+      <Footer /> {/* Integrate the Footer component here */}
     </div>
   );
-}
+};
+
+export default HomePage;

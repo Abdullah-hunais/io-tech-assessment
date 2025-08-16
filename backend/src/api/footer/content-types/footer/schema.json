@@ -1,10 +1,10 @@
 {
   "kind": "singleType",
-  "collectionName": "home_pages",
+  "collectionName": "footers",
   "info": {
-    "singularName": "home-page",
-    "pluralName": "home-pages",
-    "displayName": "Home Page"
+    "singularName": "footer",
+    "pluralName": "footers",
+    "displayName": "Footer"
   },
   "options": {
     "draftAndPublish": true
@@ -15,7 +15,7 @@
     }
   },
   "attributes": {
-    "HeroTitle": {
+    "Subscribe": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -23,43 +23,7 @@
         }
       }
     },
-    "HeroDescription": {
-      "type": "text",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "HeroBackgroundImage": {
-      "type": "media",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files"
-      ]
-    },
-    "HeroPersonImage": {
-      "type": "media",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
-    "OurTeam": {
+    "Contacts": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -67,15 +31,7 @@
         }
       }
     },
-    "OurTeamDes": {
-      "type": "text",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "TestimonialTitle": {
+    "About": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -83,28 +39,45 @@
         }
       }
     },
-    "TestimonialDes": {
-      "type": "text",
+    "OurServices": {
+      "type": "string",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       }
     },
-    "Logo": {
-      "type": "media",
+    "OurStrategy": {
+      "type": "string",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      },
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
+      }
+    },
+    "OurAdvantages": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "SocialResponsibility": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "CopyrightText": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
     }
   }
 }
