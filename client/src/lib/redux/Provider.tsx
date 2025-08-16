@@ -10,8 +10,8 @@ interface ProvidersProps {
 }
 
 function HtmlUpdater() {
-  const lang = useSelector((state: any) => state.locale.lang);
-  const dir = useSelector((state: any) => state.locale.dir);
+  const lang = useSelector((state: any) => state.language.currentLanguage);
+  const dir = useSelector((state: any) => state.language.direction);
 
   useEffect(() => {
     // Set default values if not already set

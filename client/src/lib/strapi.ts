@@ -12,6 +12,7 @@ const STRAPI_BASE_URL = "http://localhost:1337";
  * @param populate An array of relations to populate (e.g., ['HeroBackgroundImage', 'HeroPersonImage']).
  * @returns Parsed JSON data from Strapi.
  */
+
 export async function fetchStrapiData<T>(
   path: string,
   locale: "en" | "ar" = "en",
@@ -20,7 +21,9 @@ export async function fetchStrapiData<T>(
   let queryString = `locale=${locale}`;
   // Removed populate logic as images are hardcoded.
   // If you re-enable dynamic images, remember to add:
-  // if (populate.length > 0) { queryString += `&${populate.map(p => `populate[${p}]=*`).join('&')}`; }
+  if (populate.length > 0) {
+    queryString += `&${populate.map((p) => `populate[${p}]=*`).join("&")}`;
+  }
 
   const url = `${STRAPI_BASE_URL}/api${path}?${queryString}`;
 
@@ -37,6 +40,7 @@ export async function fetchStrapiData<T>(
       );
     }
     const data = await response.json();
+    console.log(`Fetched data from ${url}:`, data);
     return data as T;
   } catch (error) {
     console.error(`Error fetching data from ${url}:`, error);
@@ -46,20 +50,24 @@ export async function fetchStrapiData<T>(
 
 // getStrapiMediaUrl is no longer exported or used in components,
 // but you can keep it here for future re-integration if needed.
-/*
+interface IPopulatedMedia {
+  url: string;
+}
+
 export const getStrapiMediaUrl = (
   populatedMedia: IPopulatedMedia | null | undefined,
   width: number = 800,
   height: number = 600,
-  altText: string = 'Placeholder'
+  altText: string = "Placeholder"
 ): string => {
   if (populatedMedia?.url) {
     const url = populatedMedia.url;
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
     }
     return `${STRAPI_BASE_URL}${url}`;
   }
-  return `https://placehold.co/${width}x${height}/4A2A1A/ffffff?text=${encodeURIComponent(altText)}`;
+  return `https://placehold.co/${width}x${height}/4A2A1A/ffffff?text=${encodeURIComponent(
+    altText
+  )}`;
 };
-*/

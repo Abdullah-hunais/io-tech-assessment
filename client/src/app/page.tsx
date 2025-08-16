@@ -1,13 +1,14 @@
 // src/app/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // Re-import useState, useEffect
 import Header from "../components/Header";
 import TeamSection from "../components/TeamSection";
 import ClientTestimonialsSection from "../components/ClientTestimonialsSection";
-import Footer from "../components/Footer"; // Import the new Footer component
-import { fetchStrapiData } from "../lib/strapi"; // getStrapiMediaUrl removed
-import { HomePageAttributes, StrapiSingleResponse } from "../types/strapi";
+import Footer from "../components/Footer";
+import { fetchStrapiData, getStrapiMediaUrl } from "../lib/strapi"; // Re-import Strapi functions
+import { HomePageAttributes, StrapiSingleResponse } from "../types/strapi"; // Re-import Strapi types
+
 import { useSelector } from "react-redux";
 import { RootState } from "../lib/redux/store";
 
@@ -21,65 +22,114 @@ const HomePage: React.FC = () => {
 
   const [homePageData, setHomePageData] = useState<HomePageAttributes | null>(
     null
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  ); // Re-add homePageData state
+  const [loading, setLoading] = useState(true); // Re-add loading state
+  const [error, setError] = useState<string | null>(null); // Re-add error state
+  const [currentSlide, setCurrentSlide] = useState(0); // For the Hero Slider (if multiple slides were implemented)
 
-  // const handlePageNavigation = (path: string) => {
-  //   window.history.pushState({}, "", path);
-  //   window.dispatchEvent(new Event("popstate"));
-  // };
+  // This function is for simulating page navigation, currently not directly used
+  // but kept for future use if routing is implemented.
+  const handlePageNavigation = (path: string) => {
+    // In a real Next.js app, you'd use `router.push(path)`
+    // For this sandbox, we'll manually change the URL and rely on component re-render
+    window.history.pushState({}, "", path);
+    window.dispatchEvent(new Event("popstate"));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null);
+      setError(null); // Clear previous errors
       try {
-        // Fetching HomePage data (no populate for images)
+        // Fetching HomePage data from Strapi with image population
         const response = await fetchStrapiData<
           StrapiSingleResponse<HomePageAttributes>
-        >("/home-page", currentLanguage);
+        >(
+          "/home-page",
+          currentLanguage,
+          ["HeroBackgroundImage", "HeroPersonImage"] // Explicitly populate image and video fields
+        );
+
         if (response?.data) {
           setHomePageData(response.data.attributes);
         } else {
-          setError("Home page data not found in Strapi.");
+          // If response.data is null, it means no data was found or an empty response
+          setError(
+            "Home page data not found in Strapi. Please ensure content is published."
+          );
         }
       } catch (err: any) {
         console.error("Failed to fetch home page data:", err);
-        setError(err.message || "Failed to load home page content.");
+        setError(
+          `Failed to load home page content: ${err.message || "Unknown error."}`
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [currentLanguage]);
+  }, [currentLanguage]); // Re-fetch data when language changes
 
-  // Hardcoded image URLs for the hero section
+  // Use hardcoded placeholder values as defaults while loading or if an error occurs
+  const defaultHeroTitle =
+    currentLanguage === "en"
+      ? "Empowering Your Vision Through Law"
+      : "تمكين رؤيتك من خلال القانون";
+  const defaultHeroDescription =
+    currentLanguage === "en"
+      ? "We provide expert legal consultation for building websites, ensuring your online presence is fully compliant and legally sound. Our seasoned attorneys specialize in digital law, data privacy, and intellectual property."
+      : "نقدم استشارات قانونية متخصصة لإنشاء المواقع الإلكترونية، مما يضمن أن وجودك على الإنترنت متوافق تمامًا وسليم قانونيًا. يتخصص محامونا المتمرسون في القانون الرقمي، وخصوصية البيانات، والملكية الفكرية.";
+  const defaultOurTeamTitle =
+    currentLanguage === "en"
+      ? "Meet Our Expert Team"
+      : "تعرف على فريق الخبراء لدينا";
+  const defaultOurTeamDes =
+    currentLanguage === "en"
+      ? "Our team is a unique blend of legal experts and digital enthusiasts. We combine our deep knowledge of internet law and data privacy with a practical understanding of how websites are built and operated. We're dedicated to helping you navigate the legal landscape of the web so you can launch and grow your business with complete confidence."
+      : "فريقنا هو مزيج فريد من الخبراء القانونيين والمتحمسين للرقمنة. نحن نجمع معرفتنا العميقة بقانون الإنترنت وخصوصية البيانات مع فهم عملي لكيفية بناء وتشغيل المواقع الإلكترونية. نحن ملتزمون بمساعدتك على اجتياز المشهد القانوني للويب حتى تتمكن من إطلاق وتنمية عملك بثقة تامة.";
+  const defaultTestimonialTitle =
+    currentLanguage === "en"
+      ? "What Our Clients Are Saying"
+      : "ماذا يقول عملاؤنا";
+  const defaultTestimonialDes =
+    currentLanguage === "en"
+      ? "Our clients range from individual investors, to local, international as well as fortune 500 companies. Their success stories speak volumes about our commitment to excellence."
+      : "عملاؤنا يتراوحون من المستثمرين الأفراد إلى الشركات المحلية والعالمية، وكذلك شركات فورتشن 500. قصص نجاحهم تتحدث عن التزامنا بالتميز.";
+  const defaultHeroVideoUrl = null; // No default video URL
+
+  // If data is loading or an error occurred, use hardcoded defaults
+  const currentHomePageData = homePageData || {
+    HeroTitle: defaultHeroTitle,
+    HeroDescription: defaultHeroDescription,
+    OurTeam: defaultOurTeamTitle,
+    OurTeamDes: defaultOurTeamDes,
+    TestimonialTitle: defaultTestimonialTitle,
+    TestimonialDes: defaultTestimonialDes,
+    HeroVideoUrl: defaultHeroVideoUrl,
+  };
+
   const hardcodedBackgroundImage =
-    "https://placehold.co/1920x1080/0A0A0A/FFFFFF?text=Hero+Background"; // Example city/highway scene
+    "https://placehold.co/1920x1080/0A0A0A/FFFFFF?text=Hero+Background";
   const hardcodedPersonImage =
-    "https://placehold.co/400x500/4A2A1A/FFFFFF?text=Hero+Person"; // Example person image
+    "https://placehold.co/400x500/4A2A1A/FFFFFF?text=Hero+Person";
 
-  // Hero Slider Logic (using hardcoded images and static content for now)
-  const heroSlides = homePageData
-    ? [
-        {
-          id: 1,
-          title: homePageData.HeroTitle,
-          description: homePageData.HeroDescription,
-          backgroundImageSrc: hardcodedBackgroundImage,
-          personImageSrc: hardcodedPersonImage,
-          personImageAlt: "Hero Person Image", // Hardcoded alt text for now
-          videoUrl: homePageData.HeroVideoUrl, // Still checks for video URL from Strapi if present
-          ctaText: isRTL ? "اقرأ المزيد" : "Read More",
-        },
-      ]
-    : [];
+  // Hero Slider Logic - now uses potentially fetched data for images/video
+  const heroSlides = [
+    {
+      id: 1,
+      title: currentHomePageData.HeroTitle,
+      description: currentHomePageData.HeroDescription,
+      backgroundImage: currentHomePageData.HeroBackgroundImage, // Now uses fetched data
+      personImage: currentHomePageData.HeroPersonImage, // Now uses fetched data
+      videoUrl: currentHomePageData.HeroVideoUrl,
+      ctaText: isRTL ? "اقرأ المزيد" : "Read More",
+    },
+  ];
 
   const currentHeroSlide = heroSlides[currentSlide];
 
+  // Render loading state if still loading
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-background text-foreground">
@@ -88,20 +138,40 @@ const HomePage: React.FC = () => {
     );
   }
 
-  if (error || !homePageData) {
+  // Render error state if fetching failed and data is not available
+  if (error && !homePageData) {
     return (
       <div className="flex justify-center items-center h-screen bg-red-100 text-red-700 flex-col p-8">
-        <p className="text-xl font-bold">
-          Error: {error || "Could not load home page data."}
+        <p className="text-xl font-bold">Error: {error}</p>
+        <p className="text-lg mt-2 text-center">
+          Please ensure your Strapi server is running, the `HomePage` Single
+          Type is populated and published for locale '{currentLanguage}', and
+          public `find` permissions are granted.
         </p>
-        <p className="text-lg mt-2 text-center"></p>
       </div>
     );
   }
 
+  // Get image URLs, using getStrapiMediaUrl or hardcoded fallbacks
+  const backgroundImageSrc =
+    getStrapiMediaUrl(
+      currentHeroSlide.backgroundImage,
+      1920,
+      1080,
+      "Hero Background"
+    ) || hardcodedBackgroundImage;
+  const personImageSrc =
+    getStrapiMediaUrl(
+      currentHeroSlide.personImage,
+      400,
+      500,
+      currentHeroSlide.personImage?.alternativeText || "Hero Person"
+    ) || hardcodedPersonImage;
+
   return (
     <div className={`min-h-screen relative`}>
       <Header />
+
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           {currentHeroSlide.videoUrl ? (
@@ -115,8 +185,11 @@ const HomePage: React.FC = () => {
             />
           ) : (
             <img
-              src={currentHeroSlide.backgroundImageSrc}
-              alt={currentHeroSlide.backgroundImageSrc || "Hero Background"}
+              src={backgroundImageSrc}
+              alt={
+                currentHeroSlide.backgroundImage?.alternativeText ||
+                "Hero Background"
+              }
               className="w-full h-full object-cover"
             />
           )}
@@ -124,21 +197,7 @@ const HomePage: React.FC = () => {
           <div className="absolute inset-0 bg-brown-light opacity-20"></div>
         </div>
 
-        {heroSlides.length > 1 && (
-          <button
-            onClick={() =>
-              setCurrentSlide(
-                (prev) => (prev - 1 + heroSlides.length) % heroSlides.length
-              )
-            }
-            className={`absolute left-8 top-1/2 transform -translate-y-1/2 z-20 text-white hover:text-brown-accent transition-colors text-4xl p-2 rounded-full bg-black/30 hover:bg-black/50 ${
-              isRTL ? "rtl-flip-arrow" : ""
-            }`}
-            aria-label="Previous Slide"
-          >
-            &larr;
-          </button>
-        )}
+        {/* Removed slider navigation conditional rendering for simplicity as we are not using multiple slides for now */}
 
         <div
           className={`relative z-10 text-white flex flex-col md:flex-row items-center justify-center p-8 max-w-7xl mx-auto w-full ${
@@ -172,8 +231,11 @@ const HomePage: React.FC = () => {
             >
               <div className="absolute inset-0 flex items-center justify-center">
                 <img
-                  src={currentHeroSlide.personImageSrc}
-                  alt={currentHeroSlide.personImageAlt}
+                  src={personImageSrc}
+                  alt={
+                    currentHeroSlide.personImage?.alternativeText ||
+                    "Hero Person Image"
+                  }
                   className="w-full h-full object-cover rounded-lg"
                   style={{ transform: "scale(1.05)" }}
                 />
@@ -182,45 +244,19 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {heroSlides.length > 1 && (
-          <div className="absolute left-6 top-1/2 transform -translate-y-1/2 flex flex-col space-y-3 z-10">
-            {heroSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-colors duration-200 ${
-                  index === currentSlide ? "bg-white" : "bg-white/30"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
-
-        {heroSlides.length > 1 && (
-          <button
-            onClick={() =>
-              setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-            }
-            className={`absolute right-8 top-1/2 transform -translate-y-1/2 z-20 text-white hover:text-brown-accent transition-colors text-4xl p-2 rounded-full bg-black/30 hover:bg-black/50 ${
-              isRTL ? "rtl-flip-arrow" : ""
-            }`}
-            aria-label="Next Slide"
-          >
-            &rarr;
-          </button>
-        )}
       </section>
+
       <TeamSection
-        sectionTitle={homePageData.OurTeam}
-        sectionDescription={homePageData.OurTeamDes}
+        sectionTitle={currentHomePageData.OurTeam}
+        sectionDescription={currentHomePageData.OurTeamDes}
       />
+
       <ClientTestimonialsSection
-        sectionTitle={homePageData.TestimonialTitle}
-        sectionDescription={homePageData.TestimonialDes}
+        sectionTitle={currentHomePageData.TestimonialTitle}
+        sectionDescription={currentHomePageData.TestimonialDes}
       />
-      <Footer /> {/* Integrate the Footer component here */}
+
+      <Footer />
     </div>
   );
 };

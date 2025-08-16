@@ -1,7 +1,27 @@
 // src/types/strapi.ts
 
-// Since images are hardcoded for now, IPopulatedMedia is no longer directly used in attributes.
-// If you re-enable Strapi images later, remember to add IPopulatedMedia back to the relevant attributes.
+// This interface describes the attributes of a media item when it's directly populated (e.g., populate[field]=*)
+export interface IPopulatedMedia {
+  id: number;
+  documentId?: string; // Appears in your JSON, optional in older Strapi versions
+  name: string;
+  alternativeText: string | null;
+  caption: string | null;
+  width: number;
+  height: number;
+  // formats: any; // Can be typed more specifically if needed
+  hash: string;
+  ext: string;
+  mime: string;
+  size: number;
+  url: string; // This is the crucial URL for the image
+  previewUrl: string | null;
+  provider: string;
+  provider_metadata: any;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
 
 // Global Settings Single Type (as per your Footer needs)
 export interface GlobalSettingsAttributes {
@@ -13,14 +33,14 @@ export interface GlobalSettingsAttributes {
   OurAdvantages: string;
   SocialResponsibility: string;
   CopyrightText: string;
-  // Logo field removed as it's hardcoded in Header
+  Logo?: IPopulatedMedia; // Assuming Logo is directly populated
   FacebookLink?: string | null;
   TwitterLink?: string | null;
   LinkedInLink?: string | null;
   InstagramLink?: string | null;
 }
 
-// Home Page Single Type (Updated based on your provided JSON)
+// Home Page Single Type (Updated based on your provided JSON and re-adding image fields)
 export interface HomePageAttributes {
   HeroTitle: string;
   HeroDescription: string;
@@ -28,8 +48,9 @@ export interface HomePageAttributes {
   OurTeamDes: string;
   TestimonialTitle: string;
   TestimonialDes: string;
-  HeroVideoUrl?: string | null; // Still relevant if you plan to dynamically fetch video URLs
-  // HeroBackgroundImage and HeroPersonImage fields removed as they are hardcoded
+  HeroBackgroundImage?: IPopulatedMedia; // Re-added
+  HeroPersonImage?: IPopulatedMedia; // Re-added
+  HeroVideoUrl?: string | null;
 }
 
 // Service Collection Type
@@ -45,7 +66,7 @@ export interface ServiceAttributes {
 export interface TeamMemberAttributes {
   Name: string;
   Role: string;
-  // Image field removed as it's hardcoded
+  Image?: IPopulatedMedia; // Re-added
   Phone?: string | null;
   Email?: string | null;
   Whatsapp?: string | null;
@@ -57,7 +78,8 @@ export interface ClientTestimonialAttributes {
   ClientRole: string;
   ClientCompany?: string | null;
   Quote: string;
-  // ClientImage and ClientLogo fields removed as they are hardcoded
+  ClientImage?: IPopulatedMedia; // Re-added
+  ClientLogo?: IPopulatedMedia; // Re-added
 }
 
 // Helper for Strapi API responses (common structure for Single Types)
