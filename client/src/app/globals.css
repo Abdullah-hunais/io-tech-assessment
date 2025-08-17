@@ -17,6 +17,9 @@
   /* Ensure these font variables are correctly picked up by your Tailwind config */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-brown-dark: var(--color-primary-brown);
+  --color-brown: var(--color-secondary-brown);
 }
 
 @media (prefers-color-scheme: dark) {

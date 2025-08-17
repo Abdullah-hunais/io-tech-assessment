@@ -21,9 +21,9 @@ export async function fetchStrapiData<T>(
   let queryString = `locale=${locale}`;
   // Removed populate logic as images are hardcoded.
   // If you re-enable dynamic images, remember to add:
-  if (populate.length > 0) {
-    queryString += `&${populate.map((p) => `populate[${p}]=*`).join("&")}`;
-  }
+  //   if (populate.length > 0) {
+  //     queryString += `&${populate.map((p) => `populate[${p}]=*`).join("&")}`;
+  //   }
 
   const url = `${STRAPI_BASE_URL}/api${path}?${queryString}`;
 

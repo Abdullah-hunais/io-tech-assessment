@@ -4,12 +4,11 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react"; // Removed Phone, Mail, MapPin if not displayed
+// Re-import standard Lucide icons for Facebook, Twitter. Using Chrome as a generic Google-like icon.
+import { Facebook, Twitter, Chrome } from "lucide-react";
 
 import { useSelector } from "react-redux";
 import { RootState } from "../lib/redux/store";
-// fetchStrapiData is not used for data loading in this hardcoded version
-// Removed imports for Strapi types related to GlobalSettingsAttributes, StrapiSingleResponse
 
 interface FooterProps {}
 
@@ -39,8 +38,9 @@ const Footer: React.FC<FooterProps> = () => {
       services: "Our Services",
       copyright: "© 2024 . All rights reserved.",
       subscriptionSuccess: "Subscription successful! Thank you.",
-      subscriptionExists: "This email is already subscribed.",
-      subscriptionFailed: "Subscription failed. Please try again.",
+      subscriptionExists:
+        "This email is already subscribed (hardcoded simulation).",
+      subscriptionFailed: "Subscription failed (hardcoded simulation).",
     },
     ar: {
       subscribePlaceholder: "البريد الإلكتروني",
@@ -53,8 +53,8 @@ const Footer: React.FC<FooterProps> = () => {
       services: "خدماتنا",
       copyright: "© 2024 . جميع الحقوق محفوظة.",
       subscriptionSuccess: "تم الاشتراك بنجاح! شكرا لك.",
-      subscriptionExists: "هذا البريد الإلكتروني مشترك بالفعل.",
-      subscriptionFailed: "فشل الاشتراك. الرجاء المحاولة مرة أخرى.",
+      subscriptionExists: "هذا البريد الإلكتروني مشترك بالفعل (محاكاة).",
+      subscriptionFailed: "فشل الاشتراك (محاكاة).",
     },
   };
 
@@ -85,55 +85,26 @@ const Footer: React.FC<FooterProps> = () => {
       setSubscribeMessageType("");
 
       try {
-        // NOTE: This part still attempts to hit your Strapi API for the Subscriber collection.
-        // It will only work if your Strapi server is running and the 'Subscriber' collection
-        // type exists with an 'Email' field and Public 'create' permission.
-        // If Strapi is not running or configured, this will fail.
+        // SIMULATED API CALL - NO ACTUAL FETCH TO STRAPI HERE for UI purposes
+        await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
 
-        // Check if email already exists
-        const checkResponse = await fetch(
-          `http://localhost:1337/api/subscribers?filters[Email][$eq]=${values.email}`
-        );
-        const checkData = await checkResponse.json();
-
-        if (checkData.data && checkData.data.length > 0) {
+        // Simulate checking if email exists
+        if (values.email === "test@example.com") {
+          // Hardcoded condition for 'existing' email
           setSubscribeMessage(t("subscriptionExists"));
           setSubscribeMessageType("error");
         } else {
-          // If not exists, proceed with subscription
-          const subscribeResponse = await fetch(
-            "http://localhost:1337/api/subscribers",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                data: {
-                  Email: values.email,
-                },
-              }),
-            }
-          );
-
-          if (!subscribeResponse.ok) {
-            const errorData = await subscribeResponse.json();
-            throw new Error(
-              errorData.error?.message || t("subscriptionFailed")
-            );
-          }
-
           setSubscribeMessage(t("subscriptionSuccess"));
           setSubscribeMessageType("success");
-          resetForm();
+          resetForm(); // Clear the form on success
         }
       } catch (err: any) {
-        console.error("Subscription error:", err);
-        setSubscribeMessage(err.message || t("subscriptionFailed"));
+        setSubscribeMessage(t("subscriptionFailed"));
         setSubscribeMessageType("error");
       } finally {
         setSubmitting(false);
         setTimeout(() => {
+          // Clear message after 3 seconds
           setSubscribeMessage("");
           setSubscribeMessageType("");
         }, 3000);
@@ -152,15 +123,16 @@ const Footer: React.FC<FooterProps> = () => {
   return (
     <footer className="bg-brown-dark text-white">
       <div className="container mx-auto px-4 lg:px-8 py-12">
-        {/* Top Section: Newsletter & Social Links */}
-        <div className="flex flex-col lg:flex-row justify-between items-center mb-8">
-          {/* Newsletter */}
+        {/* Top Section: Email Form, Contacts Text, Social Links - All aligned right */}
+        {/* Using lg:gap-x-8 for consistent spacing between major items on larger screens */}
+        <div className="flex flex-col lg:flex-row items-center justify-end mb-8 lg:gap-x-8">
+          {/* Newsletter section (including form and messages) */}
           <div
-            className={`flex-1 mb-6 lg:mb-0 ${
-              isRTL ? "text-right" : "text-left"
+            className={`flex flex-col items-end mb-6 lg:mb-0 max-w-xs w-full ${
+              isRTL ? "text-left" : "text-right"
             }`}
           >
-            <form onSubmit={formik.handleSubmit} className="flex max-w-md">
+            <div className="flex rounded-lg overflow-hidden w-full bg-white">
               <input
                 type="email"
                 name="email"
@@ -168,34 +140,41 @@ const Footer: React.FC<FooterProps> = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder={t("subscribePlaceholder")}
-                className="flex-1 px-4 py-2 rounded-l-lg text-brown-primary focus:outline-none focus:ring-2 focus:ring-brown-accent"
+                // Using flex-1 to allow input to grow, adjusted padding.
+                className="flex-1 px-4 py-2 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0"
                 disabled={formik.isSubmitting}
               />
               <button
                 type="submit"
                 disabled={formik.isSubmitting}
-                className="bg-brown-accent px-6 py-2 rounded-r-lg hover:bg-opacity-80 transition-colors disabled:opacity-50 font-semibold"
+                // Ensured button doesn't shrink, provided consistent padding.
+                className="bg-brown-accent px-6 py-2 text-white hover:bg-opacity-80 transition-colors disabled:opacity-50 font-semibold shrink-0"
               >
                 {formik.isSubmitting ? "..." : t("subscribeButton")}
               </button>
-            </form>
-            {formik.touched.email && formik.errors.email && (
-              <p className="mt-2 text-sm text-red-300">{formik.errors.email}</p>
-            )}
-            {subscribeMessage && (
-              <p
-                className={`mt-2 text-sm ${
-                  subscribeMessageType === "success"
-                    ? "text-green-300"
-                    : "text-red-300"
-                }`}
-              >
-                {subscribeMessage}
-              </p>
-            )}
+            </div>
+
+            {/* Validation/Success Messages for Newsletter - positioned directly below the input/button */}
+            <div className="w-full mt-2">
+              {formik.touched.email && formik.errors.email && (
+                <p className="text-sm text-red-300">{formik.errors.email}</p>
+              )}
+              {subscribeMessage && (
+                <p
+                  className={`text-sm ${
+                    subscribeMessageType === "success"
+                      ? "text-green-300"
+                      : "text-red-300"
+                  }`}
+                >
+                  {subscribeMessage}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Social Links & Contact Info */}
+          {/* Adjusted spacing and flex order for mobile vs desktop */}
           <div
             className={`flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 ${
               isRTL ? "md:space-x-reverse" : ""
@@ -211,37 +190,32 @@ const Footer: React.FC<FooterProps> = () => {
                 isRTL ? "rtl:space-x-reverse" : ""
               }`}
             >
+              {/* Twitter Filled Icon */}
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Twitter"
               >
-                <Twitter className="w-6 h-6 hover:text-brown-accent transition-colors" />
+                <Twitter className="w-6 h-6 hover:text-brown-accent transition-colors fill-current" />
               </a>
+              {/* Facebook Filled Icon */}
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
               >
-                <Facebook className="w-6 h-6 hover:text-brown-accent transition-colors" />
+                <Facebook className="w-6 h-6 hover:text-brown-accent transition-colors fill-current" />
               </a>
+              {/* Google Icon (Using Chrome as a generic filled Google icon from Lucide) */}
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram"
+                aria-label="Google Plus"
               >
-                <Instagram className="w-6 h-6 hover:text-brown-accent transition-colors" />
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-6 h-6 hover:text-brown-accent transition-colors" />
+                <Chrome className="w-6 h-6 hover:text-brown-accent transition-colors fill-current" />
               </a>
             </div>
           </div>
@@ -250,7 +224,7 @@ const Footer: React.FC<FooterProps> = () => {
         {/* Divider */}
         <hr className="border-white/20 my-8" />
 
-        {/* Bottom Section: Links & Copyright */}
+        {/* Bottom Section: Links (Left) & Copyright (Right) */}
         <div className="flex flex-col lg:flex-row justify-between items-center text-center lg:text-left">
           {/* Footer Navigation Links */}
           <div
