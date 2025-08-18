@@ -36,7 +36,7 @@ export async function fetchStrapiData<T>(
       method: "GET", // or POST
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.SECRET_API_TOKEN}`, // Use environment variable for security
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_API_TOKEN}`, // Use environment variable for security
       },
     });
 
