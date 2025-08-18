@@ -121,18 +121,19 @@ const Footer: React.FC<FooterProps> = () => {
   ];
 
   return (
-    <footer className="bg-brown-dark text-white">
-      <div className="container mx-auto px-4 lg:px-8 py-12">
+    <footer className="bg-[var(--color-brown-dark)] text-[var(--foreground)]">
+      <div className="container bg-brown-dark mx-auto px-4 lg:px-8 py-12">
         {/* Top Section: Email Form, Contacts Text, Social Links - All aligned right */}
         {/* Using lg:gap-x-8 for consistent spacing between major items on larger screens */}
         <div className="flex flex-col lg:flex-row items-center justify-end mb-8 lg:gap-x-8">
           {/* Newsletter section (including form and messages) */}
-          <div
-            className={`flex flex-col items-end mb-6 lg:mb-0 max-w-xs w-full ${
-              isRTL ? "text-left" : "text-right"
-            }`}
-          >
-            <div className="flex rounded-lg overflow-hidden w-full bg-white">
+          {/* Newsletter section: aligned to the right before Contacts */}
+          <div className="flex ml-auto mb-6 lg:mb-0">
+            <div
+              className={`flex items-center w-[300px] rounded-lg bg-white px-2 py-1 ${
+                isRTL ? "flex-row-reverse" : "flex-row"
+              }`}
+            >
               <input
                 type="email"
                 name="email"
@@ -140,36 +141,16 @@ const Footer: React.FC<FooterProps> = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder={t("subscribePlaceholder")}
-                // Using flex-1 to allow input to grow, adjusted padding.
-                className="flex-1 px-4 py-2 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0"
+                className="flex-1 px-3 py-2 text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-0"
                 disabled={formik.isSubmitting}
               />
               <button
                 type="submit"
                 disabled={formik.isSubmitting}
-                // Ensured button doesn't shrink, provided consistent padding.
-                className="bg-brown-accent px-6 py-2 text-white hover:bg-opacity-80 transition-colors disabled:opacity-50 font-semibold shrink-0"
+                className="bg-[var(--color-brown-dark)] text-white text-sm font-semibold px-3 py-1 rounded hover:bg-brown-accent transition-colors disabled:opacity-50"
               >
                 {formik.isSubmitting ? "..." : t("subscribeButton")}
               </button>
-            </div>
-
-            {/* Validation/Success Messages for Newsletter - positioned directly below the input/button */}
-            <div className="w-full mt-2">
-              {formik.touched.email && formik.errors.email && (
-                <p className="text-sm text-red-300">{formik.errors.email}</p>
-              )}
-              {subscribeMessage && (
-                <p
-                  className={`text-sm ${
-                    subscribeMessageType === "success"
-                      ? "text-green-300"
-                      : "text-red-300"
-                  }`}
-                >
-                  {subscribeMessage}
-                </p>
-              )}
             </div>
           </div>
 

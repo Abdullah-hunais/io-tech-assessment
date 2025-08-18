@@ -11,6 +11,7 @@ import { HomePageAttributes, StrapiSingleResponse } from "../types/strapi"; // R
 
 import { useSelector } from "react-redux";
 import { RootState } from "../lib/redux/store";
+import "./globals.css";
 
 const HomePage: React.FC = () => {
   const currentLanguage = useSelector(
@@ -51,7 +52,7 @@ const HomePage: React.FC = () => {
         );
 
         if (response?.data) {
-          setHomePageData(response.data.attributes);
+          setHomePageData(response.data);
         } else {
           // If response.data is null, it means no data was found or an empty response
           setError(
@@ -120,7 +121,7 @@ const HomePage: React.FC = () => {
       id: 1,
       title: currentHomePageData.HeroTitle,
       description: currentHomePageData.HeroDescription,
-      backgroundImage: currentHomePageData.HeroBackgroundImage, // Now uses fetched data
+      backgroundImage: currentHomePageData.HeroBackgroundImages, // Now uses fetched data
       personImage: currentHomePageData.HeroPersonImage, // Now uses fetched data
       videoUrl: currentHomePageData.HeroVideoUrl,
       ctaText: isRTL ? "اقرأ المزيد" : "Read More",
@@ -167,11 +168,9 @@ const HomePage: React.FC = () => {
       500,
       currentHeroSlide.personImage?.alternativeText || "Hero Person"
     ) || hardcodedPersonImage;
-
   return (
     <div className={`min-h-screen relative`}>
       <Header />
-
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           {currentHeroSlide.videoUrl ? (
@@ -215,7 +214,7 @@ const HomePage: React.FC = () => {
             <p className="text-lg mb-8 leading-relaxed max-w-xl opacity-90">
               {currentHeroSlide.description}
             </p>
-            <button className="bg-white text-brown-primary px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors shadow-lg">
+            <button className="bg-white text-[var(--color-brown-dark)] px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors shadow-lg">
               {currentHeroSlide.ctaText}
             </button>
           </div>
@@ -245,17 +244,15 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
       <TeamSection
         sectionTitle={currentHomePageData.OurTeam}
         sectionDescription={currentHomePageData.OurTeamDes}
       />
-
       <ClientTestimonialsSection
         sectionTitle={currentHomePageData.TestimonialTitle}
         sectionDescription={currentHomePageData.TestimonialDes}
       />
-
+      <div className="h-5 bg-white"></div>
       <Footer />
     </div>
   );

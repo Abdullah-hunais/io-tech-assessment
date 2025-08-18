@@ -19,11 +19,14 @@ export async function fetchStrapiData<T>(
   populate: string[] = [] // Populate array is ignored for now as images are hardcoded
 ): Promise<T | null> {
   let queryString = `locale=${locale}`;
+
   // Removed populate logic as images are hardcoded.
-  // If you re-enable dynamic images, remember to add:
-  //   if (populate.length > 0) {
-  //     queryString += `&${populate.map((p) => `populate[${p}]=*`).join("&")}`;
-  //   }
+  //   If you re-enable dynamic images, remember to add:
+  if (populate.length > 0) {
+    queryString += `&${populate
+      .map((p, index) => `populate[${index}]=${p}`)
+      .join("&")}`;
+  }
 
   const url = `${STRAPI_BASE_URL}/api${path}?${queryString}`;
 
@@ -40,7 +43,7 @@ export async function fetchStrapiData<T>(
       );
     }
     const data = await response.json();
-    console.log(`Fetched data from ${url}:`, data);
+    // console.log(`Fetched data from ${url}:`, data);
     return data as T;
   } catch (error) {
     console.error(`Error fetching data from ${url}:`, error);

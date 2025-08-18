@@ -79,14 +79,12 @@ const Header: React.FC<HeaderProps> = () => {
 
   const handleSearchSubmit = () => {
     if (searchQuery.trim()) {
-      //   window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
       setIsSearchOverlayOpen(false);
       dispatch(setSearchQuery(""));
     }
   };
 
-  // Hardcoded logo path
-  const staticLogoPath = "/logo.png"; // Make sure logo.png is in your public/ directory
+  const staticLogoPath = "/logo.png";
 
   const navItems = [
     { name: t("nav.home"), href: "/" },
@@ -100,12 +98,11 @@ const Header: React.FC<HeaderProps> = () => {
     <header className="absolute top-0 left-0 right-0 z-50 bg-transparent py-4 md:py-6">
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo - Manually added */}
           <div className="flex-shrink-0">
             <img
               src={staticLogoPath}
-              alt="Your Website Logo"
-              className="h-10 w-auto"
+              alt=" Website Logo"
+              className="h-18 w-25"
             />
           </div>
 
@@ -127,18 +124,18 @@ const Header: React.FC<HeaderProps> = () => {
                 onClick={() =>
                   setIsServicesDropdownOpen(!isServicesDropdownOpen)
                 }
-                className="text-white hover:text-brown-accent transition-colors flex items-center group"
+                className="text-white hover:text-brown-accent  transition-colors flex items-center group"
               >
                 {t("nav.services")}{" "}
                 <ChevronDown
-                  className={`ml-1 w-4 h-4 transition-transform duration-200 ${
+                  className={`ml-1 w-4 h-4  transition-transform duration-200 ${
                     isServicesDropdownOpen ? "rotate-180" : "rotate-0"
                   }`}
                 />
               </button>
 
               {isServicesDropdownOpen && (
-                <div className="absolute top-full mt-2 bg-brown-light rounded-lg shadow-lg min-w-[200px] py-2 z-50">
+                <div className="absolute top-full bg-[var(--color-brown-dark)]  mt-2 bg-brown-light rounded-lg shadow-lg min-w-[200px] py-2 z-50">
                   {hardcodedServices.length > 0 ? (
                     hardcodedServices.map((service) => (
                       <a

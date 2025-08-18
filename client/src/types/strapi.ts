@@ -84,10 +84,7 @@ export interface ClientTestimonialAttributes {
 
 // Helper for Strapi API responses (common structure for Single Types)
 export interface StrapiSingleResponse<T> {
-  data: {
-    id: number;
-    attributes: T;
-  } | null;
+  data: any;
   meta: any;
 }
 

@@ -563,7 +563,7 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    HeroBackgroundImage: Schema.Attribute.Media<'images' | 'files'> &
+    HeroBackgroundImage: Schema.Attribute.Media<'images' | 'files', true> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
@@ -650,6 +650,12 @@ export interface ApiTeamMemberTeamMember extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Email: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     Image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<
@@ -657,11 +663,23 @@ export interface ApiTeamMemberTeamMember extends Struct.CollectionTypeSchema {
       'api::team-member.team-member'
     >;
     Name: Schema.Attribute.String;
+    Phone: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     Role: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Whatsapp: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
   };
 }
 
