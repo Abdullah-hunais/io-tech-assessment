@@ -3,7 +3,8 @@
 // No IPopulatedMedia import needed as images are hardcoded for now
 // No getStrapiMediaUrl export needed as it's not used by components directly now
 
-const STRAPI_BASE_URL = "http://localhost:1337";
+// const STRAPI_BASE_URL = "http://localhost:1337";
+const STRAPI_BASE_URL = "https://diligent-birds-eb00defbed.strapiapp.com";
 
 /**
  * Fetches data from Strapi API.
@@ -31,7 +32,13 @@ export async function fetchStrapiData<T>(
   const url = `${STRAPI_BASE_URL}/api${path}?${queryString}`;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: "GET", // or POST
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer d8956a332638d6b98d8c58329bcec0b5b9708ac0444ff9ce5294064180eeb74a69604c3a7055bfad6cc1ff4f341b0d67973cc36ec74bb5a203fc66c5938ae8b2ec83e08c03b95f52c3f504812bcc3441ba7f22dc6ac4b890027c395c6544e58389452e3ab9273f130c091350eea9cdeb83225fa9e2a04eaea7c0f65409e23372`,
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
