@@ -1,8 +1,5 @@
 // src/lib/strapi.ts
 
-// No IPopulatedMedia import needed as images are hardcoded for now
-// No getStrapiMediaUrl export needed as it's not used by components directly now
-
 // const STRAPI_BASE_URL = "http://localhost:1337";
 const STRAPI_BASE_URL = "https://diligent-birds-eb00defbed.strapiapp.com";
 
@@ -10,19 +7,17 @@ const STRAPI_BASE_URL = "https://diligent-birds-eb00defbed.strapiapp.com";
  * Fetches data from Strapi API.
  * @param path The API endpoint path (e.g., '/home-page', '/team-members').
  * @param locale The locale to fetch (e.g., 'en', 'ar').
- * @param populate An array of relations to populate (e.g., ['HeroBackgroundImage', 'HeroPersonImage']).
+ * @param populate An array of relations to populate
  * @returns Parsed JSON data from Strapi.
  */
 
 export async function fetchStrapiData<T>(
   path: string,
   locale: "en" | "ar" = "en",
-  populate: string[] = [] // Populate array is ignored for now as images are hardcoded
+  populate: string[] = []
 ): Promise<T | null> {
   let queryString = `locale=${locale}`;
 
-  // Removed populate logic as images are hardcoded.
-  //   If you re-enable dynamic images, remember to add:
   if (populate.length > 0) {
     queryString += `&${populate
       .map((p, index) => `populate[${index}]=${p}`)
@@ -33,7 +28,7 @@ export async function fetchStrapiData<T>(
 
   try {
     const response = await fetch(url, {
-      method: "GET", // or POST
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_API_TOKEN}`, // Use environment variable for security
@@ -58,8 +53,6 @@ export async function fetchStrapiData<T>(
   }
 }
 
-// getStrapiMediaUrl is no longer exported or used in components,
-// but you can keep it here for future re-integration if needed.
 interface IPopulatedMedia {
   url: string;
 }
