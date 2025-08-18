@@ -50,14 +50,12 @@ const TeamSection: React.FC<TeamSectionProps> = ({
     fetchData();
   }, [currentLanguage]); // Re-fetch data when language changes
 
-  // Hardcoded team members data
   if (loading || !teamMembersData) {
     return <></>;
   }
 
   const membersPerSlide = 3;
   const totalSlides = teamMembersData.length;
-  // const totalSlides = Math.ceil(hardcodedTeamMembers.length / membersPerSlide);
 
   const displayedMembers = teamMembersData;
 
@@ -104,7 +102,7 @@ const TeamSection: React.FC<TeamSectionProps> = ({
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
 
-                <h3 className="text-xl font-bold text-brown-primary mb-2">
+                <h3 className="text-xl font-bold [color:var(--color-brown-dark)] text-brown-primary mb-2">
                   {member.Name}
                 </h3>
                 <p className="text-gray-500 text-sm uppercase tracking-wide mb-4">
@@ -153,7 +151,7 @@ const TeamSection: React.FC<TeamSectionProps> = ({
             ))}
           </div>
 
-          {/* Navigation Arrows (Only show if there are multiple slides) */}
+          {/* Navigation Arrows  */}
           {totalSlides > 1 && (
             <>
               <button
