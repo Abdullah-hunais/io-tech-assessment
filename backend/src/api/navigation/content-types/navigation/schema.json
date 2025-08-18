@@ -1,10 +1,10 @@
 {
   "kind": "singleType",
-  "collectionName": "footers",
+  "collectionName": "navigations",
   "info": {
-    "singularName": "footer",
-    "pluralName": "footers",
-    "displayName": "Footer"
+    "singularName": "navigation",
+    "pluralName": "navigations",
+    "displayName": "Navigation"
   },
   "options": {
     "draftAndPublish": true
@@ -15,15 +15,7 @@
     }
   },
   "attributes": {
-    "Subscribe": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "Contacts": {
+    "Home": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -39,7 +31,7 @@
         }
       }
     },
-    "OurServices": {
+    "Blog": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -47,7 +39,7 @@
         }
       }
     },
-    "OurStrategy": {
+    "Team": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -55,7 +47,7 @@
         }
       }
     },
-    "OurAdvantages": {
+    "Contact": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -63,7 +55,7 @@
         }
       }
     },
-    "SocialResponsibility": {
+    "Services": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -71,7 +63,7 @@
         }
       }
     },
-    "CopyrightText": {
+    "Booking": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -79,24 +71,7 @@
         }
       }
     },
-    "FooterSection": {
-      "type": "enumeration",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "enum": [
-        "Subscribe",
-        "Contacts",
-        "About",
-        "Our Services",
-        "Our Strategy",
-        "Our Advantages",
-        "Social Responsibility  "
-      ]
-    },
-    "Footer": {
+    "ServicesDropDown": {
       "type": "json",
       "pluginOptions": {
         "i18n": {

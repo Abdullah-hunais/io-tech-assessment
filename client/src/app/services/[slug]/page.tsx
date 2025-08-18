@@ -136,7 +136,7 @@ const ServiceDetailPage: React.FC<{ params: { slug: string } }> = ({
 
   // Hardcoded image URLs for the hero section (same as homepage)
   const hardcodedBackgroundImage =
-    "https://placehold.co/1920x1080/0A0A0A/FFFFFF?text=Hero+Background";
+    "https://images.squarespace-cdn.com/content/v1/6411cb044aadc4188f8a33fc/4bd7e015-90c0-4a71-a569-382adb65c32b/Colin_Field_Dempster_DJI_0120.jpg";
 
   const t = (textObj: { en: string; ar: string }) =>
     isRTL ? textObj.ar : textObj.en;

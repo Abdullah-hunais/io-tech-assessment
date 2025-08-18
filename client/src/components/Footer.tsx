@@ -1,7 +1,7 @@
 // src/components/Footer.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 // Re-import standard Lucide icons for Facebook, Twitter. Using Chrome as a generic Google-like icon.
@@ -9,6 +9,7 @@ import { Facebook, Twitter, Chrome } from "lucide-react";
 
 import { useSelector } from "react-redux";
 import { RootState } from "../lib/redux/store";
+import { fetchStrapiData } from "../lib/strapi";
 
 interface FooterProps {}
 
@@ -24,6 +25,33 @@ const Footer: React.FC<FooterProps> = () => {
   const [subscribeMessageType, setSubscribeMessageType] = useState<
     "success" | "error" | ""
   >("");
+
+  const [loading, setLoading] = useState(false);
+  const [footerData, setFooterData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetching HomePage data from Strapi with image population
+        const response = await fetchStrapiData<any>("/footer", currentLanguage);
+
+        if (response?.data) {
+          setFooterData(response.data);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch  data:", err);
+      }
+    };
+
+    fetchData();
+  }, [currentLanguage]); // Re-fetch data when language changes
+
+  // Hardcoded team members data
+  if (loading || !footerData) {
+    return <></>;
+  }
 
   // Hardcoded text translations for Footer
   const footerTranslations = {
@@ -74,50 +102,12 @@ const Footer: React.FC<FooterProps> = () => {
       .required("Email is required"),
   });
 
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-    },
-    validationSchema: validationSchema,
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
-      setSubmitting(true);
-      setSubscribeMessage("");
-      setSubscribeMessageType("");
-
-      try {
-        // SIMULATED API CALL - NO ACTUAL FETCH TO STRAPI HERE for UI purposes
-        await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
-
-        // Simulate checking if email exists
-        if (values.email === "test@example.com") {
-          // Hardcoded condition for 'existing' email
-          setSubscribeMessage(t("subscriptionExists"));
-          setSubscribeMessageType("error");
-        } else {
-          setSubscribeMessage(t("subscriptionSuccess"));
-          setSubscribeMessageType("success");
-          resetForm(); // Clear the form on success
-        }
-      } catch (err: any) {
-        setSubscribeMessage(t("subscriptionFailed"));
-        setSubscribeMessageType("error");
-      } finally {
-        setSubmitting(false);
-        setTimeout(() => {
-          // Clear message after 3 seconds
-          setSubscribeMessage("");
-          setSubscribeMessageType("");
-        }, 3000);
-      }
-    },
-  });
-
   const footerNavLinks = [
-    { text: t("about"), href: "/about-us" },
-    { text: t("strategy"), href: "/strategy" },
-    { text: t("advantages"), href: "/advantages" },
-    { text: t("responsibility"), href: "/responsibility" },
-    { text: t("services"), href: "/services" },
+    { text: footerData.About, href: "/about-us" },
+    { text: footerData.OurStrategy, href: "/strategy" },
+    { text: footerData.OurAdvantages, href: "/advantages" },
+    { text: footerData.SocialResponsibility, href: "/responsibility" },
+    { text: footerData.OurServices, href: "/services" },
   ];
 
   return (
@@ -137,19 +127,14 @@ const Footer: React.FC<FooterProps> = () => {
               <input
                 type="email"
                 name="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder={t("subscribePlaceholder")}
+                placeholder={footerData.Subscribe}
                 className="flex-1 px-3 py-2 text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-0"
-                disabled={formik.isSubmitting}
               />
               <button
                 type="submit"
-                disabled={formik.isSubmitting}
                 className="bg-[var(--color-brown-dark)] text-white text-sm font-semibold px-3 py-1 rounded hover:bg-brown-accent transition-colors disabled:opacity-50"
               >
-                {formik.isSubmitting ? "..." : t("subscribeButton")}
+                {footerData.Subscribe}
               </button>
             </div>
           </div>
@@ -164,7 +149,7 @@ const Footer: React.FC<FooterProps> = () => {
             <span
               className={`text-lg font-semibold ${isRTL ? "ml-4" : "mr-4"}`}
             >
-              {t("contacts")}
+              {footerData.Contacts}
             </span>
             <div
               className={`flex space-x-4 text-white ${
@@ -223,7 +208,7 @@ const Footer: React.FC<FooterProps> = () => {
           </div>
 
           {/* Copyright */}
-          <div className="text-white/80 text-sm">{t("copyright")}</div>
+          <div className="text-white/80 text-sm">{footerData.Copyright}</div>
         </div>
       </div>
     </footer>

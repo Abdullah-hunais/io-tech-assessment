@@ -1,12 +1,13 @@
 // src/components/Header.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, ChevronDown, Menu, X } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../lib/redux/store";
 import { setLanguage } from "../lib/redux/languageSlice";
 import { setSearchQuery } from "../lib/redux/searchSlice";
+import { fetchStrapiData } from "../lib/strapi";
 
 interface HeaderProps {}
 
@@ -23,6 +24,35 @@ const Header: React.FC<HeaderProps> = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [navigation, setNavigation] = useState<any>(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetching HomePage data from Strapi with image population
+        const response = await fetchStrapiData<any>(
+          "/navigation",
+          currentLanguage
+        );
+
+        if (response?.data) {
+          setNavigation(response.data);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch  data:", err);
+      }
+    };
+
+    fetchData();
+  }, [currentLanguage]); // Re-fetch data when language changes
+
+  // Hardcoded team members data
+  if (loading || !navigation) {
+    return <></>;
+  }
 
   // Hardcoded text translations for Header
   const headerTranslations = {
@@ -60,16 +90,16 @@ const Header: React.FC<HeaderProps> = () => {
   // Hardcoded services for the dropdown
   const hardcodedServices = [
     {
-      title: "Legal Consultation Services",
+      title: navigation.ServicesDropDown[0],
       slug: "legal-consultation-services",
     },
     {
-      title: "Foreign Investment Services",
+      title: navigation.ServicesDropDown[1],
       slug: "foreign-investment-services",
     },
-    { title: "Contracts", slug: "contracts" },
-    { title: "Notarization", slug: "notarization" },
-    { title: "Insurance", slug: "insurance" },
+    { title: navigation.ServicesDropDown[2], slug: "contracts" },
+    { title: navigation.ServicesDropDown[3], slug: "notarization" },
+    { title: navigation.ServicesDropDown[4], slug: "insurance" },
   ];
 
   const toggleLanguage = () => {
@@ -87,11 +117,11 @@ const Header: React.FC<HeaderProps> = () => {
   const staticLogoPath = "/logo.png";
 
   const navItems = [
-    { name: t("nav.home"), href: "/" },
-    { name: t("nav.about"), href: "/about-us" },
-    { name: t("nav.blog"), href: "/blog" },
-    { name: t("nav.team"), href: "/team" },
-    { name: t("nav.contact"), href: "/contact" },
+    { name: navigation.Home, href: "/" },
+    { name: navigation.About, href: "/about-us" },
+    { name: navigation.Blog, href: "/blog" },
+    { name: navigation.Team, href: "/team" },
+    { name: navigation.Contact, href: "/contact" },
   ];
 
   return (
@@ -126,7 +156,7 @@ const Header: React.FC<HeaderProps> = () => {
                 }
                 className="text-white hover:text-brown-accent  transition-colors flex items-center group"
               >
-                {t("nav.services")}{" "}
+                {navigation.Services}{" "}
                 <ChevronDown
                   className={`ml-1 w-4 h-4  transition-transform duration-200 ${
                     isServicesDropdownOpen ? "rotate-180" : "rotate-0"
@@ -181,7 +211,7 @@ const Header: React.FC<HeaderProps> = () => {
 
             {/* Book Appointment Button (Desktop Only) */}
             <button className="hidden lg:block bg-transparent border border-white text-white px-4 py-2 rounded hover:bg-white hover:text-brown-primary transition-colors">
-              {t("nav.bookAppointment")}
+              {navigation.Booking}
             </button>
 
             {/* Mobile Menu Toggle */}

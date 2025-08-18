@@ -48,7 +48,7 @@ export interface HomePageAttributes {
   OurTeamDes: string;
   TestimonialTitle: string;
   TestimonialDes: string;
-  HeroBackgroundImage?: IPopulatedMedia; // Re-added
+  HeroBackgroundImage?: IPopulatedMedia[]; // Re-added
   HeroPersonImage?: IPopulatedMedia; // Re-added
   HeroVideoUrl?: string | null;
 }

@@ -26,13 +26,10 @@ const HomePage: React.FC = () => {
   ); // Re-add homePageData state
   const [loading, setLoading] = useState(true); // Re-add loading state
   const [error, setError] = useState<string | null>(null); // Re-add error state
-  const [currentSlide, setCurrentSlide] = useState(0); // For the Hero Slider (if multiple slides were implemented)
+  const [currentSlide, setCurrentSlide] = useState(0); // For the Hero background slider
 
   // This function is for simulating page navigation, currently not directly used
-  // but kept for future use if routing is implemented.
   const handlePageNavigation = (path: string) => {
-    // In a real Next.js app, you'd use `router.push(path)`
-    // For this sandbox, we'll manually change the URL and rely on component re-render
     window.history.pushState({}, "", path);
     window.dispatchEvent(new Event("popstate"));
   };
@@ -48,13 +45,12 @@ const HomePage: React.FC = () => {
         >(
           "/home-page",
           currentLanguage,
-          ["HeroBackgroundImage", "HeroPersonImage"] // Explicitly populate image and video fields
+          ["HeroBackgroundImage", "HeroPersonImage"] // Populate multiple background images
         );
 
         if (response?.data) {
           setHomePageData(response.data);
         } else {
-          // If response.data is null, it means no data was found or an empty response
           setError(
             "Home page data not found in Strapi. Please ensure content is published."
           );
@@ -70,7 +66,26 @@ const HomePage: React.FC = () => {
     };
 
     fetchData();
-  }, [currentLanguage]); // Re-fetch data when language changes
+  }, [currentLanguage]);
+
+  // Auto-slide background images every 5 seconds
+  useEffect(() => {
+    if (loading || !homePageData) {
+      return;
+    }
+    if (homePageData!.HeroBackgroundImage!.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentSlide(
+          (prev) => (prev + 1) % homePageData!.HeroBackgroundImage!.length
+        );
+      }, 5000); // change every 5 seconds
+      return () => clearInterval(interval);
+    }
+  }, [homePageData]);
+
+  if (loading || !homePageData) {
+    return <></>;
+  }
 
   // Use hardcoded placeholder values as defaults while loading or if an error occurs
   const defaultHeroTitle =
@@ -97,9 +112,8 @@ const HomePage: React.FC = () => {
     currentLanguage === "en"
       ? "Our clients range from individual investors, to local, international as well as fortune 500 companies. Their success stories speak volumes about our commitment to excellence."
       : "عملاؤنا يتراوحون من المستثمرين الأفراد إلى الشركات المحلية والعالمية، وكذلك شركات فورتشن 500. قصص نجاحهم تتحدث عن التزامنا بالتميز.";
-  const defaultHeroVideoUrl = null; // No default video URL
+  const defaultHeroVideoUrl = null;
 
-  // If data is loading or an error occurred, use hardcoded defaults
   const currentHomePageData = homePageData || {
     HeroTitle: defaultHeroTitle,
     HeroDescription: defaultHeroDescription,
@@ -110,27 +124,10 @@ const HomePage: React.FC = () => {
     HeroVideoUrl: defaultHeroVideoUrl,
   };
 
-  const hardcodedBackgroundImage =
-    "https://placehold.co/1920x1080/0A0A0A/FFFFFF?text=Hero+Background";
   const hardcodedPersonImage =
     "https://placehold.co/400x500/4A2A1A/FFFFFF?text=Hero+Person";
 
-  // Hero Slider Logic - now uses potentially fetched data for images/video
-  const heroSlides = [
-    {
-      id: 1,
-      title: currentHomePageData.HeroTitle,
-      description: currentHomePageData.HeroDescription,
-      backgroundImage: currentHomePageData.HeroBackgroundImages, // Now uses fetched data
-      personImage: currentHomePageData.HeroPersonImage, // Now uses fetched data
-      videoUrl: currentHomePageData.HeroVideoUrl,
-      ctaText: isRTL ? "اقرأ المزيد" : "Read More",
-    },
-  ];
-
-  const currentHeroSlide = heroSlides[currentSlide];
-
-  // Render loading state if still loading
+  // Render loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-background text-foreground">
@@ -139,7 +136,7 @@ const HomePage: React.FC = () => {
     );
   }
 
-  // Render error state if fetching failed and data is not available
+  // Render error state
   if (error && !homePageData) {
     return (
       <div className="flex justify-center items-center h-screen bg-red-100 text-red-700 flex-col p-8">
@@ -153,30 +150,33 @@ const HomePage: React.FC = () => {
     );
   }
 
-  // Get image URLs, using getStrapiMediaUrl or hardcoded fallbacks
+  // Get current background image from slider
   const backgroundImageSrc =
     getStrapiMediaUrl(
-      currentHeroSlide.backgroundImage,
+      homePageData?.HeroBackgroundImage?.[currentSlide],
       1920,
       1080,
-      "Hero Background"
-    ) || hardcodedBackgroundImage;
+      homePageData?.HeroBackgroundImage?.[currentSlide]?.alternativeText ||
+        "Hero Background"
+    ) || "";
+
   const personImageSrc =
     getStrapiMediaUrl(
-      currentHeroSlide.personImage,
+      currentHomePageData.HeroPersonImage,
       400,
       500,
-      currentHeroSlide.personImage?.alternativeText || "Hero Person"
+      currentHomePageData.HeroPersonImage?.alternativeText || "Hero Person"
     ) || hardcodedPersonImage;
+
   return (
     <div className={`min-h-screen relative`}>
       <Header />
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          {currentHeroSlide.videoUrl ? (
+          {currentHomePageData.HeroVideoUrl ? (
             <video
               className="w-full h-full object-cover"
-              src={currentHeroSlide.videoUrl}
+              src={currentHomePageData.HeroVideoUrl}
               autoPlay
               loop
               muted
@@ -185,18 +185,13 @@ const HomePage: React.FC = () => {
           ) : (
             <img
               src={backgroundImageSrc}
-              alt={
-                currentHeroSlide.backgroundImage?.alternativeText ||
-                "Hero Background"
-              }
-              className="w-full h-full object-cover"
+              alt="Hero Background"
+              className="w-full h-full object-cover transition-opacity duration-1000"
             />
           )}
           <div className="absolute inset-0 bg-black/50"></div>
           <div className="absolute inset-0 bg-brown-light opacity-20"></div>
         </div>
-
-        {/* Removed slider navigation conditional rendering for simplicity as we are not using multiple slides for now */}
 
         <div
           className={`relative z-10 text-white flex flex-col md:flex-row items-center justify-center p-8 max-w-7xl mx-auto w-full ${
@@ -209,13 +204,13 @@ const HomePage: React.FC = () => {
             } mb-8 md:mb-0`}
           >
             <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              {currentHeroSlide.title}
+              {currentHomePageData.HeroTitle}
             </h1>
             <p className="text-lg mb-8 leading-relaxed max-w-xl opacity-90">
-              {currentHeroSlide.description}
+              {currentHomePageData.HeroDescription}
             </p>
             <button className="bg-white text-[var(--color-brown-dark)] px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors shadow-lg">
-              {currentHeroSlide.ctaText}
+              {isRTL ? "اقرأ المزيد" : "Read More"}
             </button>
           </div>
 
@@ -232,7 +227,7 @@ const HomePage: React.FC = () => {
                 <img
                   src={personImageSrc}
                   alt={
-                    currentHeroSlide.personImage?.alternativeText ||
+                    currentHomePageData.HeroPersonImage?.alternativeText ||
                     "Hero Person Image"
                   }
                   className="w-full h-full object-cover rounded-lg"
@@ -244,6 +239,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
       <TeamSection
         sectionTitle={currentHomePageData.OurTeam}
         sectionDescription={currentHomePageData.OurTeamDes}
